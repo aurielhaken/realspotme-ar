@@ -1,23 +1,102 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>SpotMe AR</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.6/aframe/build/aframe-ar.min.js"></script>
-  </head>
-  <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs='sourceType: webcam;'>
-      <!-- Exemple : Ami positionné à ces coordonnées GPS -->
-      <a-text 
-        value="🎯 Ami ici !" 
-        look-at="[gps-camera]" 
-        scale="20 20 20" 
-        gps-entity-place="latitude: 36.510; longitude: -4.885" 
-        position="0 0 0">
-      </a-text>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>RealSpotMe AR</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: black;
+    }
 
-      <a-camera gps-camera rotation-reader></a-camera>
-    </a-scene>
-  </body>
+    #arrow {
+      width: 80px;
+      position: fixed;
+      top: 40%;
+      left: 45%;
+      transform: rotate(0deg);
+      transition: transform 0.5s ease-in-out;
+      z-index: 999;
+    }
+
+    video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      object-fit: cover;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Flèche en surimpression -->
+  <img id="arrow" src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Red_Arrow_Down.svg" />
+
+  <!-- Caméra vidéo plein écran -->
+  <video id="camera" autoplay playsinline muted></video>
+
+  <script>
+    // Ami fictif (à remplacer par GPS réel de ton pote)
+    const friendPosition = {
+      latitude: 36.5110,     // Exemple : Marbella
+      longitude: -4.8840
+    };
+
+    // Fonction pour activer la caméra
+    async function startCamera() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        document.getElementById('camera').srcObject = stream;
+      } catch (err) {
+        alert("Erreur d'accès à la caméra : " + err.message);
+      }
+    }
+
+    // Calcul de l’angle entre ta position et celle de l’ami
+    function getAngleBetweenPositions(userLat, userLon, targetLat, targetLon) {
+      const toRad = deg => deg * Math.PI / 180;
+      const dLon = toRad(targetLon - userLon);
+      const y = Math.sin(dLon) * Math.cos(toRad(targetLat));
+      const x = Math.cos(toRad(userLat)) * Math.sin(toRad(targetLat)) -
+                Math.sin(toRad(userLat)) * Math.cos(toRad(targetLat)) * Math.cos(dLon);
+      const brng = Math.atan2(y, x);
+      return (brng * 180 / Math.PI + 360) % 360;
+    }
+
+    // Appliquer la rotation à la flèche
+    function updateArrowRotation(angle) {
+      const arrow = document.getElementById("arrow");
+      if (arrow) arrow.style.transform = `rotate(${angle}deg)`;
+    }
+
+    // Obtenir la position GPS
+    function locateAndPoint() {
+      if (!navigator.geolocation) {
+        alert("Géolocalisation non disponible.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(position => {
+        const userLat = position.coords.latitude;
+        const userLon = position.coords.longitude;
+        const angle = getAngleBetweenPositions(userLat, userLon, friendPosition.latitude, friendPosition.longitude);
+        updateArrowRotation(angle);
+      }, err => {
+        alert("Erreur de géolocalisation : " + err.message);
+      }, {
+        enableHighAccuracy: true
+      });
+    }
+
+    // Lancer au chargement
+    window.onload = () => {
+      startCamera();
+      locateAndPoint();
+    };
+  </script>
+</body>
 </html>
