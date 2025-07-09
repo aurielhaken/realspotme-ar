@@ -80,7 +80,10 @@
         return;
       }
 
-      navigator.geolocation.getCurrentPosition(position => {
+     const friendPosition = {
+  latitude: 36.5099,
+  longitude: -4.8827
+}; navigator.geolocation.getCurrentPosition(position => {
         const userLat = position.coords.latitude;
         const userLon = position.coords.longitude;
         const angle = getAngleBetweenPositions(userLat, userLon, friendPosition.latitude, friendPosition.longitude);
