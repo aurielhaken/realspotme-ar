@@ -80,19 +80,25 @@
         return;
       }
 
-     const friendPosition = {
-  latitude: 36.493980,
-  longitude: -4.952830
-}; navigator.geolocation.getCurrentPosition(position => {
-        const userLat = position.coords.latitude;
-        const userLon = position.coords.longitude;
-        const angle = getAngleBetweenPositions(userLat, userLon, friendPosition.latitude, friendPosition.longitude);
-        updateArrowRotation(angle);
-      }, err => {
-        alert("Erreur de géolocalisation : " + err.message);
-      }, {
-        enableHighAccuracy: true
-      });
+      setInterval(() => {
+        navigator.geolocation.getCurrentPosition(position => {
+          const userLat = position.coords.latitude;
+          const userLon = position.coords.longitude;
+
+          const angle = getAngleBetweenPositions(
+            userLat,
+            userLon,
+            friendPosition.latitude,
+            friendPosition.longitude
+          );
+
+          updateArrowRotation(angle);
+        }, err => {
+          console.error("Erreur de géolocalisation : " + err.message);
+        }, {
+          enableHighAccuracy: true
+        });
+      }, 5000); // Met à jour toutes les 5 secondes
     }
 
     // Lancer au chargement
