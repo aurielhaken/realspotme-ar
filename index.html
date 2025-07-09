@@ -1,34 +1,23 @@
 <!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8" />
-  <title>SpotMe AR</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #114360, #243b55);
-      color: white;
-      text-align: center;
-      padding-top: 20vh;
-    }
-    h1 {
-      font-size: 3em;
-      margin-bottom: 0.5em;
-    }
-    p {
-      font-size: 1.5em;
-      color: #ccc;
-    }
-    .logo {
-      font-size: 4em;
-      margin-bottom: 0.2em;
-    }
-  </style>
-</head>
-<body>
-  <div class="logo">📍</div>
-  <h1>Bienvenue sur SpotMe AR </h1>
-  <p>L'application de géolocalisation pour retrouver tes amis dans les lieux bondés</p>
-</body>
+<html>
+  <head>
+    <title>SpotMe AR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <script src="https://cdn.rawgit.com/jeromeetienne/ar.js/1.7.6/aframe/build/aframe-ar.min.js"></script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <a-scene embedded arjs='sourceType: webcam;'>
+      <!-- Exemple : Ami positionné à ces coordonnées GPS -->
+      <a-text 
+        value="🎯 Ami ici !" 
+        look-at="[gps-camera]" 
+        scale="20 20 20" 
+        gps-entity-place="latitude: 36.510; longitude: -4.885" 
+        position="0 0 0">
+      </a-text>
+
+      <a-camera gps-camera rotation-reader></a-camera>
+    </a-scene>
+  </body>
 </html>
